@@ -67,8 +67,7 @@ Article.fetchAll = () => {
       url: 'data/hackerIpsum.json',
       method: 'GET',
       success: function(data, message, xhr) {
-        console.log(data);
-        localStorage.setItem('rawData', data);
+        localStorage.setItem('rawData', JSON.stringify(data));
         Article.loadAll(data);
         articleView.initIndexPage();
       },
@@ -79,6 +78,6 @@ Article.fetchAll = () => {
 
 
     // COMMENT: Discuss the sequence of execution in this 'else' conditional. Why are these functions executed in this order?
-    // First we have to get the data using a AJAX and jQuery from the hackerIpsum.json file. We then are setting the data into localStorage, and loading it into the page.
+    // First we have to get the data using AJAX and jQuery from the hackerIpsum.json file. We then are setting the data into localStorage, and loading it into the page.
   }
 }
