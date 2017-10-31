@@ -13,7 +13,7 @@ function Article (rawDataObj) {
 Article.all = [];
 
 // COMMENT: Why isn't this method written as an arrow function?
-// PUT YOUR RESPONSE HERE
+// The method below isn't written as an arrow function because it needs to use contextual this.
 Article.prototype.toHtml = function() {
   let template = Handlebars.compile($('#article-template').text());
 
@@ -21,7 +21,7 @@ Article.prototype.toHtml = function() {
 
   // COMMENT: What is going on in the line below? What do the question mark and colon represent? How have we seen this same logic represented previously?
   // Not sure? Check the docs!
-  // PUT YOUR RESPONSE HERE
+  // The line below is another way to write an if/else statement, where the ? is the if and the : is the else.
   this.publishStatus = this.publishedOn ? `published ${this.daysAgo} days ago` : '(draft)';
   this.body = marked(this.body);
 
@@ -33,7 +33,7 @@ Article.prototype.toHtml = function() {
 // REVIEW: This function will take the rawData, how ever it is provided, and use it to instantiate all the articles. This code is moved from elsewhere, and encapsulated in a simply-named function for clarity.
 
 // COMMENT: Where is this function called? What does 'rawData' represent now? How is this different from previous labs?
-// PUT YOUR RESPONSE HERE
+// The function is called in Article.fetchAll(). rawData now represents the data we are externally retrieving. In previous labs, rawData represented hard-coded data stored locally in a separate file.
 Article.loadAll = rawData => {
   rawData.sort((a,b) => (new Date(b.publishedOn)) - (new Date(a.publishedOn)))
 
@@ -44,25 +44,41 @@ Article.loadAll = rawData => {
 Article.fetchAll = () => {
   // REVIEW: What is this 'if' statement checking for? Where was the rawData set to local storage?
   if (localStorage.rawData) {
+
     // REVIEW: When rawData is already in localStorage we can load it with the .loadAll function above and then render the index page (using the proper method on the articleView object).
 
-    //TODO: This function takes in an argument. What do we pass in to loadAll()?
-    Article.loadAll();
+    //DONE: This function takes in an argument. What do we pass in to loadAll()?
+    Article.loadAll(JSON.parse(localStorage.rawData));
 
-    //TODO: What method do we call to render the index page?
+    //DONE: What method do we call to render the index page?
+    articleView.initIndexPage();
 
-    // COMMENT: How is this different from the way we rendered the index page previously? What the benefits of calling the method here?
-    // PUT YOUR RESPONSE HERE
+    // COMMENT: How is this different from the way we rendered the index page previously? What are the benefits of calling the method here?
+    // To render the index.html page, we call the articleView.initIndexPage(). Previously, we called the articleView.initIndexPage() function in the index.html file.
 
   } else {
-    // TODO: When we don't already have the rawData:
+    // DONE: When we don't already have the rawData:
     // - we need to retrieve the JSON file from the server with AJAX (which jQuery method is best for this?)
     // - we need to cache it in localStorage so we can skip the server call next time
     // - we then need to load all the data into Article.all with the .loadAll function above
     // - then we can render the index page
 
+    $.ajax ({
+      url: 'data/hackerIpsum.json',
+      method: 'GET',
+      success: function(data, message, xhr) {
+        console.log(data);
+        localStorage.setItem('rawData', data);
+        Article.loadAll(data);
+        articleView.initIndexPage();
+      },
+      fail: function(err) {
+        console.error(err);
+      }
+    });
+
 
     // COMMENT: Discuss the sequence of execution in this 'else' conditional. Why are these functions executed in this order?
-    // PUT YOUR RESPONSE HERE
+    // First we have to get the data using a AJAX and jQuery from the hackerIpsum.json file. We then are setting the data into localStorage, and loading it into the page.
   }
 }
